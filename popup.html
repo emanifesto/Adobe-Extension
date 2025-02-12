@@ -4,36 +4,35 @@
         <title>Adobe Stock Automator</title>
         <link href="styles.css" rel="stylesheet">
     </head>
-    <body>
-        <main>
-            <div class="welcome"><h1>Welcome</h1></div>
+    <body class="adb-stock">
+        <main class="adb-main">
+            <div class="welcome-rand-text"><h1>Welcome</h1></div>
             <div class="input">
-                <form class="api">
-                    <input type="text" class="api-text-box"placeholder="Enter api key here...">
-                    <button type="submit" class="save-btn">Save</button>
+                <form class="api-quest-form" action="#" method="POST">
+                    <input type="text" id="api-text-box" placeholder="Enter api key here...">
+                    <button id="save-api" type="submit" class="save-btn">Save</button>
                 </form>
 
-                <form class="num-keywords">
-                    <input type="text" class="num-keywords-text-box" placeholder="Enter # of keywords...">
-                    <button type="submit" class="save-btn">Save</button>
+                <form class="num-keywords" action="#" method="POST">
+                    <input type="text" id="num-keywords-text-box" placeholder="Enter # of keywords...">
+                    <button id="save-num" type="submit" class="save-btn">Save</button>
                 </form>
             </div>
 
-            <form class="ai"><label>Generative AI only?<input class="check" type="checkbox"></label></form>
+            <form class="ai-only-query"><label>Generative AI only?<input class="check-ai-only" type="checkbox"></label></form>
 
-            <div class="line"></div>
+            <div class="line-border-sepa"></div>
+            <p class="text-upg-prem">Upgrade to premium for full automation.</p>
 
-            <p class="text">Upgrade to premium for full automation.</p>
+            <form class="automate-btn-holder" action="#" method="POST"><button class="hands-free" type="submit"><div class="play-stock-auto"></div></button></form>
 
-            <form class="automate"><button class="hands-free" type="submit"><div class="play"></div></button></form>
-
-            <button class="the-btn" type="submit"><img class="icon" src="icon2.png" alt="the extension icon"></button>
-
-            <form class="footer">
-                <button type="submit" class="sub-btn">Subscription</button>
-                <button type="submit" class="feed-btn">Feedback</button>
+            <form class="footer-sub-feed" action="#" method="POST">
+                <button type="submit" class="sub-btn-blue">Subscription</button>
+                <button type="submit" class="feed-btn-orange">Feedback</button>
             </form>
 
         </main>
+        <script src="content.js"></script>
+        <script src="background.js"></script>
     </body>
 </html>

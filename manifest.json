@@ -1,15 +1,33 @@
 {
-    "name": "Adobe Automation Tool",
+    "name": "Adobe Stock Metadata Automation",
     "description": "your life is complete now",
     "version": "1.0",
     "manifest_version": 3,
+    "permissions": ["activeTab", "storage", "scripting"],
     "icons":{
-        "16":"icon1.png",
-        "48":"icon1.png",
-        "128":"icon1.png"
+        "16":"icon-asma1.png",
+        "32":"icon-asma1.png",
+        "48":"icon-asma1.png",
+        "128":"icon-asma1.png"
     },
     "action":{
         "default_popup": "popup.html",
-        "default_icon": "icon1.png"
-    }
+        "default_icon": "icon-asma1.png"
+    },
+    "background": {
+        "service_workers": "background.js"
+    },
+    "content_scripts":[
+        {
+            "js": ["content.js"],
+            "matches": ["<all_urls>"],
+            "css": ["styles.css"]
+        }
+    ],
+    "web_accessible_resources" : [
+        {
+            "resources": ["icons/icon2.png"],
+            "matches": ["<all_urls>"]
+        }
+    ]
 }
