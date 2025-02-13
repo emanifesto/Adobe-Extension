@@ -1,4 +1,4 @@
-// const saveAPI = document.getElementById("save-api")
+const saveAPI = document.getElementById("save-api")
 const saveNum = document.getElementById('save-num')
 const aiOnly = document.querySelector('input.check-ai-only')
 const subsciprtion = document.querySelector('button.sub-btn-blue')
@@ -19,20 +19,35 @@ document.addEventListener('DOMContentLoaded', ()=>{
         }
     })
 
-    // document.addEventListener('mousemove', injectButton);
+    chrome.storage.sync.get('aiImages', (result) => {
+        if(result.aiImages){
+            aiOnly.checked = true
+        }
+    })
 })
 
 
-document.getElementById('save-api').addEventListener('click', function() {
+saveAPI.addEventListener('click', function() {
     const APIKey = document.getElementById('api-text-box').value;
     chrome.storage.sync.set({ 'api': APIKey }, function() {
         alert('Saved.');
     });
 });
 
-document.getElementById('save-num').addEventListener('click', function(){
+saveNum.addEventListener('click', function(){
     const numsKeywords = document.getElementById('num-keywords-text-box').value;
-    chrome.storage.sync.set({ 'keywords': numsKeywords }, function(){
-        alert('Saved.')
-    })
+    if (Number(numsKeywords) > 0 && Number(numsKeywords) < 50){
+        chrome.storage.sync.set({ 'keywords': numsKeywords }, function(){
+            alert('Saved.')
+        })
+    }else{
+        alert("Try a number between 1 and 49.")
+    }
+})
+
+aiOnly.addEventListener('click', function(){
+    if (aiOnly.checked)
+        chrome.storage.sync.set({'aiImages': "true"})
+    else
+        chrome.storage.sync.set({'aiImages': null})
 })

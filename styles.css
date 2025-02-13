@@ -27,7 +27,7 @@ h1{
     font-size: 30px;
 }
 
-input, input:focus{
+.input-alice-blue, .input-alice-blue:focus{
     color:aliceblue;
 }
 
