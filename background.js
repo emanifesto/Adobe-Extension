@@ -4,7 +4,7 @@ const aiOnly = document.querySelector('input.check-ai-only')
 const subsciprtion = document.querySelector('button.sub-btn-blue')
 const feedback = document.querySelector('button.feed-btn-orange')
 
-console.log('does this work?')
+// console.log('does this work?')
 
 document.addEventListener('DOMContentLoaded', ()=>{
     chrome.storage.sync.get('api', function(result) {
@@ -36,7 +36,7 @@ saveAPI.addEventListener('click', function() {
 
 saveNum.addEventListener('click', function(){
     const numsKeywords = document.getElementById('num-keywords-text-box').value;
-    if (Number(numsKeywords) > 0 && Number(numsKeywords) < 50){
+    if ((Number(numsKeywords) > 0 && Number(numsKeywords) < 50) || !numsKeywords){
         chrome.storage.sync.set({ 'keywords': numsKeywords }, function(){
             alert('Saved.')
         })

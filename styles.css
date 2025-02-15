@@ -89,7 +89,7 @@ h1{
     width: 50%;
     margin: 15px auto;
     font-size: 15px;
-    display: display;
+    display: none;
 }
 
 .sub-btn-blue, .feed-btn-orange{
@@ -129,7 +129,7 @@ h1{
     cursor: pointer;
     opacity: 0.9;
     transition: transform opacity 250ms;    
-    display: none;
+    display: inline-block;
 }
 
 .hands-free:hover, .hands-free:focus{
@@ -160,7 +160,7 @@ h1{
 #the-btn{
     background-color: black;
     width: 99%;
-    margin: 10px auto;
+    margin: 10px auto 15px;
     padding: 5px 100px;
     border: 0;
     border-radius: 8px;
