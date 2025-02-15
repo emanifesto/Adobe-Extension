@@ -4,9 +4,11 @@ const aiOnly = document.querySelector('input.check-ai-only')
 const subsciprtion = document.querySelector('button.sub-btn-blue')
 const feedback = document.querySelector('button.feed-btn-orange')
 
-// console.log('does this work?')
 
 document.addEventListener('DOMContentLoaded', ()=>{
+
+    console.log(chrome.storage)
+
     chrome.storage.sync.get('api', function(result) {
         if (result.api){
             document.getElementById('api-text-box').value = result.api;
