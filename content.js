@@ -3,7 +3,31 @@
 
 document.addEventListener('mousemove', setUpEnv)
 
+// document.addEventListener('click', fullAuto)
 
+async function fullAuto(){
+    const save = document.querySelector('div.margin-left-small > button.button--action')
+    let next = document.querySelector('ul.the-paginator-list').lastChild.firstChild
+    // while(next.innerHTML === "Next"){
+        console.log(next.innerHTML)
+        next.click()
+    // }
+}
+
+// const keywords = "bottle, cork, twine, glowing, galaxy, stars, mystical, fantasy, liquid, sparkles, night, cosmic, illumination, colorful, background, decorative, potion, amber, scientific, artistic"
+// const title = "Glowing Galaxy Potion Bottle: Mystical Cork Twine Decor with Colorful Liquid and Sparkles in a Cosmic Night Background - An Artistic Fantasy of Illuminated Stars"
+// document.addEventListener('click', function(){
+//     input(keywords, title)})
+
+// function input(keywords, title){
+//     const titleBox = document.querySelector('textarea[aria-label="Content title"]')
+//     const keywordBox = document.querySelector('textarea[aria-label="Paste Keywords..."]')
+//     titleBox.value = title
+//     titleBox.dispatchEvent(new Event('input', {bubbles: true}))
+
+//     keywordBox.value = keywords
+//     keywordBox.dispatchEvent(new Event('input', {bubbles: true}))
+// }
 
 async function setUpEnv(){
     if (!document.querySelector('button#the-btn')){
@@ -48,7 +72,8 @@ async function setUpEnv(){
                 alert('Number of keywords is not set!')
                 throw new Error('Number of keywords is not set.')
             }
-            makeKeys(apiKey, numKeys, aiImages)
+            //make a listener that toggles this listener on and off upon clicking play
+            loadMetadata(apiKey, numKeys, aiImages)
         })
     }
 }
@@ -74,41 +99,50 @@ async function getAiImages(){
 
 
 
-async function loadMetadata(){
-    let apiKey = await getAPIkey()
-    let numKeys = await getNumKeys()
-    let aiImages = await getAiImages()
-    // let button = await 
-}
-
-async function makeKeys(apiKey, numKeys, aiImages){
-    console.log(apiKey)
-    console.log(numKeys)
-    console.log(aiImages + '\n')
-
-    if (aiImages){
-        checkGenAI()
-    }
+async function loadMetadata(apiKey, numKeys, aiImages){
 
     const url = 'https://api.openai.com/v1/chat/completions'
-    const image = document.querySelector(`div[aria-selected="true"] > div > img`).src
     const header = new Headers({
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json"
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
     })
+
+    if(aiImages)
+        checkGenAI()
+
+    const keywords = await makeKeys(numKeys, url, header)
+    const title = await makeTitle(keywords, url, header)
+
+    const titleBox = document.querySelector('textarea[aria-label="Content title"]')
+    const keywordBox = document.querySelector('textarea[aria-label="Paste Keywords..."]')
+    titleBox.value = title
+    titleBox.dispatchEvent(new Event('input', {bubbles: true}))
+
+    keywordBox.value = keywords
+    keywordBox.dispatchEvent(new Event('input', {bubbles: true}))
+
+    if (aiImages)
+        checkPeople()
+}
+
+
+
+async function makeKeys(numKeys, url, header){
+
+    const image = document.querySelector(`div[aria-selected="true"] > div > img`).src
 
     const payload = {
         model: "gpt-4o-mini",
         messages: [
             {
                 role: 'system',
-                content: "Prioritize short-tail keywords and don't repeat the same words."//"You are the best SEO tool in the world. You make content easy to find in the Adobe Stock search algorithm.",
+                content: "Prioritize short-tail keywords and don't repeat the same words"//"You are the best SEO tool in the world. You make content easy to find in the Adobe Stock search algorithm.",
             },
             {
                 role: 'user',
                 content: [{
                         type: 'text',
-                        text: `Analyze the image throughly. From it, respond with EXACTLY ${numKeys} mainly keywords separated by commas.`
+                        text: `Analyze the image throughly. From it, respond with EXACTLY ${numKeys} keywords separated by commas`
                     },{
                         type: 'image_url',
                         image_url: {
@@ -127,33 +161,61 @@ async function makeKeys(apiKey, numKeys, aiImages){
         })
         if (!response.ok){
             alert("OpenAI is experiencing issues!")
-            return
+            throw new Error('OpenAI is experiencing issues.')
         }
         const data = await response.json()
-        console.log('done')
+        console.log(data)
+
         let roughKeys = data.choices[0].message.content
-        console.log(roughKeys)
 
         if (roughKeys[roughKeys.length - 1] === '.')
             roughKeys = roughKeys.substring(0, roughKeys.length - 1)
 
-
         const temp = roughKeys.split(', ')
         if (temp.length > numKeys){
             const finalKeys = temp.slice(0, numKeys).join(', ')
-            console.log(finalKeys)
+            return finalKeys
         }else{
-            console.log(roughKeys)
+            return roughKeys
         }
-        console.log(data.usage)
-
     }catch(err){
         alert(`Something went wrong. Try setting up API key and number of keywords.`)
         console.log(err)
     }
+}
 
-    if (aiImages){
-        checkPeople()
+async function makeTitle(keywords, url, header){
+    const payload = {
+        model: 'gpt-4o-mini',
+        messages: [
+            {
+                role: 'system',
+                content: "While under 190 characters, keep adding to the title from the first ten keywords"
+            },{
+                role: 'user',
+                content: `Analyze the following image keywords and respond with an SEO title. (${keywords})`
+            }
+        ]
+    }
+//While under 190 characters, keep adding to the title from the first ten keywords.
+//ALWAYS include the first 10 keywords and don't go over 200 characters
+    try{
+        const response = await fetch(url, {
+            'method': 'POST',
+            'headers': header,
+            'body': JSON.stringify(payload)
+        })
+        if (!response.ok){
+            alert("OpenAI is experiencing issues!")
+            throw new Error('OpenAI is experiencing issues.')
+        }
+        const data = await response.json()
+        console.log(data)
+
+        return data.choices[0].message.content
+    }catch(err){
+        alert('Something went wrong.')
+        console.log(err)
     }
 }
 
@@ -162,7 +224,6 @@ function checkGenAI(){
     if (!genAI.checked)
         genAI.click()
 }
-
 
 function checkPeople(){
     const people = document.querySelector("input#content-tagger-generative-ai-property-release-checkbox")
