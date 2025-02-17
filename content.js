@@ -1,33 +1,67 @@
 //Aqif the OPP
 
 
-document.addEventListener('mousemove', setUpEnv)
+document.addEventListener('mousemove', function handler(){
+    this.removeEventListener('mousemove', handler)
+    setUpEnv()
+})
 
-// document.addEventListener('click', fullAuto)
+// document.addEventListener('keypress', function(){
+//     const target = document.querySelector('div.content-grid').firstChild
+//     target.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.click()
+//     console.log(target.className)
+// })
+
+function stall(ms){
+    return new Promise(resolve => setTimeout(resolve, ms))
+}
 
 async function fullAuto(){
     const save = document.querySelector('div.margin-left-small > button.button--action')
     let next = document.querySelector('ul.the-paginator-list').lastChild.firstChild
-    // while(next.innerHTML === "Next"){
-        console.log(next.innerHTML)
+    console.log('entering loop')
+
+    while(next.innerHTML === 'Next'){
+        next = document.querySelector('ul.the-paginator-list').lastChild.firstChild
+        let target = document.querySelector('div.content-grid').firstChild
+
+
+        await stall(1000)
+        console.log('metadata-ing')
+
+        while (target.className === 'container-inline-block'){
+            target.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.click()
+
+            while(document.querySelector('div.keywords-input')){
+                console.log('do not tag yet')
+                await stall(200)
+            }
+            
+            checkGenAI()
+
+            await stall(1000)//metadata-ing
+
+            target = target.nextSibiling
+            await stall(1000)
+        }
+
+        save.click()
+        while(save.innerHTML === "Saving work..."){
+            await stall(200)
+        }
+
+        console.log('metadata saved')
+        
         next.click()
-    // }
+        await stall(1000)
+        while (document.querySelector('div[data-t="content-spinner-wrapper"]').style.display === 'block'){
+            await stall(1000)
+        }
+    }
+    console.log('all done')
 }
 
-// const keywords = "bottle, cork, twine, glowing, galaxy, stars, mystical, fantasy, liquid, sparkles, night, cosmic, illumination, colorful, background, decorative, potion, amber, scientific, artistic"
-// const title = "Glowing Galaxy Potion Bottle: Mystical Cork Twine Decor with Colorful Liquid and Sparkles in a Cosmic Night Background - An Artistic Fantasy of Illuminated Stars"
-// document.addEventListener('click', function(){
-//     input(keywords, title)})
 
-// function input(keywords, title){
-//     const titleBox = document.querySelector('textarea[aria-label="Content title"]')
-//     const keywordBox = document.querySelector('textarea[aria-label="Paste Keywords..."]')
-//     titleBox.value = title
-//     titleBox.dispatchEvent(new Event('input', {bubbles: true}))
-
-//     keywordBox.value = keywords
-//     keywordBox.dispatchEvent(new Event('input', {bubbles: true}))
-// }
 
 async function setUpEnv(){
     if (!document.querySelector('button#the-btn')){
@@ -43,27 +77,30 @@ async function setUpEnv(){
         const target = document.querySelector('div.visible');
         target.insertBefore(button, target.firstChild);
 
-        setTimeout(
-            function(){
-                document.removeEventListener('mousemove', setUpEnv)
-                // document.addEventListener('mousemove', makeKeys)
-            }, 3000)
-
-
         let apiKey = await getAPIkey()
         let numKeys = await getNumKeys()
         let aiImages = await getAiImages()
+        const url = 'https://api.openai.com/v1/chat/completions'
+        let header = new Headers({
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+        })
 
         chrome.storage.onChanged.addListener((changes, namespace) => {
-            if (changes.api)
+            if (changes.api){
                 apiKey = changes.api['newValue']
+                header = new Headers({
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                })
+            }
             if (changes.keywords)
                 numKeys = changes.keywords['newValue']
             if (changes.aiImages)
                 aiImages = changes.aiImages['newValue']
         })
 
-        document.querySelector('button#the-btn').addEventListener('click', function(){
+        document.querySelector('button#the-btn').addEventListener('click', function s(){
             if (!apiKey){
                 alert('API key is not set!')
                 throw new Error('API key is not set.')
@@ -72,8 +109,18 @@ async function setUpEnv(){
                 alert('Number of keywords is not set!')
                 throw new Error('Number of keywords is not set.')
             }
+            chrome.action.onClicked.addListener(() =>{
+                document.querySelector('div.play-stock-auto').addEventListener('click', async function(){
+                    this.removeEventListener('click', s)
+                    console.log('pretending to automate')
+                    await stall(5000)
+                    console.log('done pretending')
+                    this.addEventListener('click', s)
+                })
+            })
             //make a listener that toggles this listener on and off upon clicking play
-            loadMetadata(apiKey, numKeys, aiImages)
+            console.log('pretending to tag')
+            // loadMetadata(numKeys, aiImages, url, header)
         })
     }
 }
@@ -99,13 +146,7 @@ async function getAiImages(){
 
 
 
-async function loadMetadata(apiKey, numKeys, aiImages){
-
-    const url = 'https://api.openai.com/v1/chat/completions'
-    const header = new Headers({
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-    })
+async function loadMetadata(apiKey, numKeys, aiImages, url, header){
 
     if(aiImages)
         checkGenAI()
