@@ -7,9 +7,11 @@ document.addEventListener('mousemove', function handler(){
 })
 
 // document.addEventListener('keypress', function(){
-//     const target = document.querySelector('div.content-grid').firstChild
-//     target.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.click()
-//     console.log(target.className)
+    // const target = document.querySelector('div.content-grid > div > div > div > div > div').firstChild
+    // console.log(target.className)
+
+    // const target = document.querySelector('div[aria-selected="true"]').parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
+    // console.log(target.className)
 // })
 
 function stall(ms){
@@ -17,13 +19,15 @@ function stall(ms){
 }
 
 async function fullAuto(){
+    //throw errors
+    //try catch  - sending message to switch pause to play if finished or stopped abruptly
     const save = document.querySelector('div.margin-left-small > button.button--action')
     let next = document.querySelector('ul.the-paginator-list').lastChild.firstChild
     console.log('entering loop')
 
     while(next.innerHTML === 'Next'){
         next = document.querySelector('ul.the-paginator-list').lastChild.firstChild
-        let target = document.querySelector('div.content-grid').firstChild
+        let target = document.querySelector('div[aria-selected="true"]').parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
 
 
         await stall(1000)
@@ -109,15 +113,16 @@ async function setUpEnv(){
                 alert('Number of keywords is not set!')
                 throw new Error('Number of keywords is not set.')
             }
-            chrome.action.onClicked.addListener(() =>{
-                document.querySelector('div.play-stock-auto').addEventListener('click', async function(){
-                    this.removeEventListener('click', s)
-                    console.log('pretending to automate')
-                    await stall(5000)
-                    console.log('done pretending')
-                    this.addEventListener('click', s)
-                })
-            })
+            // chrome.action.onClicked.addListener(() =>{
+            //     console.log('im here')
+                // document.querySelector('div.play-stock-auto').addEventListener('click', async function(){
+                //     this.removeEventListener('click', s)
+                //     console.log('pretending to automate')
+                //     await stall(5000)
+                //     console.log('done pretending')
+                //     this.addEventListener('click', s)
+                // })
+            // })
             //make a listener that toggles this listener on and off upon clicking play
             console.log('pretending to tag')
             // loadMetadata(numKeys, aiImages, url, header)
@@ -146,7 +151,7 @@ async function getAiImages(){
 
 
 
-async function loadMetadata(apiKey, numKeys, aiImages, url, header){
+async function loadMetadata(numKeys, aiImages, url, header){
 
     if(aiImages)
         checkGenAI()

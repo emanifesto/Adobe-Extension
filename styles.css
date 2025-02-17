@@ -89,7 +89,7 @@ h1{
     width: 50%;
     margin: 15px auto;
     font-size: 15px;
-    display: none;
+    display: inline-block;
 }
 
 .sub-btn-blue, .feed-btn-orange{

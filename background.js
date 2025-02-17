@@ -7,8 +7,7 @@ const feedback = document.querySelector('button.feed-btn-orange')
 
 document.addEventListener('DOMContentLoaded', ()=>{
 
-    console.log(chrome.storage)
-
+//chrome-extension://gnapbdecbbnaalohhpcocalcefhlofnk
     chrome.storage.sync.get('api', function(result) {
         if (result.api){
             document.getElementById('api-text-box').value = result.api;
@@ -26,8 +25,57 @@ document.addEventListener('DOMContentLoaded', ()=>{
             aiOnly.checked = true
         }
     })
+
+
+    chrome.storage.sync.get('payment', async (result) => {
+        if (result.payment === 'none'){
+            document.querySelector('p.text-upg-prem').innerHTML = 'Upgrade to premium for full automation.'
+        }
+        if (result.payment === 'hands free'){
+
+            document.querySelector('p.text-upg-prem').style.display = 'none'
+
+            const btnHolder = document.createElement('form')
+            btnHolder.className = 'automate-btn-holder'
+
+            const btn = document.createElement('button')
+            btn.className = 'hands-free'
+
+            const icon = document.createElement('div')
+            let response = await chrome.storage.sync.get('automation')
+            if (response.automation)
+                icon.className = 'pause-stock-auto'
+            else
+                icon.className = 'play-stock-auto'
+
+            btn.appendChild(icon)
+            btnHolder.appendChild(btn)
+
+            const target = document.querySelector('form.footer-sub-feed')
+            target.parentNode.insertBefore(btnHolder, target)
+
+            btn.addEventListener('click', function(){
+                if (icon.className === 'play-stock-auto'){
+                    icon.className = 'pause-stock-auto'
+                    chrome.storage.sync.set({'automation': 'running'})
+                }
+                else if (icon.className === 'pause-stock-auto'){
+                    icon.className = 'play-stock-auto'
+                    chrome.storage.sync.set({'automation': null})
+                }
+            })
+        }
+    })
 })
 
+chrome.storage.sync.set({'payment': 'hands free'})
+
+
+async function getAutomation(){
+    const response = await chrome.storage.sync.get('automation')
+    const automation = response.automation
+    return automation
+}
 
 saveAPI.addEventListener('click', function() {
     const APIKey = document.getElementById('api-text-box').value;
