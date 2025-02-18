@@ -58,8 +58,17 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 if (icon.className === 'play-stock-auto'){
                     icon.className = 'pause-stock-auto'
                     chrome.storage.sync.set({'automation': 'running'})
+                    chrome.runtime.sendMessage('started')
                 }
                 else if (icon.className === 'pause-stock-auto'){
+                    icon.className = 'play-stock-auto'
+                    chrome.storage.sync.set({'automation': null})
+                    chrome.runtime.sendMessage('halted')
+                }
+            })
+
+            chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+                if (message === 'stopped'){
                     icon.className = 'play-stock-auto'
                     chrome.storage.sync.set({'automation': null})
                 }
@@ -68,7 +77,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     })
 })
 
-chrome.storage.sync.set({'payment': 'hands free'})
+chrome.storage.sync.set({'payment': 'none'})
 
 
 async function getAutomation(){

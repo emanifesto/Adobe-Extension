@@ -1,71 +1,13 @@
 //Aqif the OPP
 
-
 document.addEventListener('mousemove', function handler(){
     this.removeEventListener('mousemove', handler)
     setUpEnv()
 })
 
-// document.addEventListener('keypress', function(){
-    // const target = document.querySelector('div.content-grid > div > div > div > div > div').firstChild
-    // console.log(target.className)
-
-    // const target = document.querySelector('div[aria-selected="true"]').parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
-    // console.log(target.className)
-// })
-
 function stall(ms){
     return new Promise(resolve => setTimeout(resolve, ms))
 }
-
-async function fullAuto(){
-    //throw errors
-    //try catch  - sending message to switch pause to play if finished or stopped abruptly
-    const save = document.querySelector('div.margin-left-small > button.button--action')
-    let next = document.querySelector('ul.the-paginator-list').lastChild.firstChild
-    console.log('entering loop')
-
-    while(next.innerHTML === 'Next'){
-        next = document.querySelector('ul.the-paginator-list').lastChild.firstChild
-        let target = document.querySelector('div[aria-selected="true"]').parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
-
-
-        await stall(1000)
-        console.log('metadata-ing')
-
-        while (target.className === 'container-inline-block'){
-            target.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.click()
-
-            while(document.querySelector('div.keywords-input')){
-                console.log('do not tag yet')
-                await stall(200)
-            }
-            
-            checkGenAI()
-
-            await stall(1000)//metadata-ing
-
-            target = target.nextSibiling
-            await stall(1000)
-        }
-
-        save.click()
-        while(save.innerHTML === "Saving work..."){
-            await stall(200)
-        }
-
-        console.log('metadata saved')
-        
-        next.click()
-        await stall(1000)
-        while (document.querySelector('div[data-t="content-spinner-wrapper"]').style.display === 'block'){
-            await stall(1000)
-        }
-    }
-    console.log('all done')
-}
-
-
 
 async function setUpEnv(){
     if (!document.querySelector('button#the-btn')){
@@ -104,7 +46,7 @@ async function setUpEnv(){
                 aiImages = changes.aiImages['newValue']
         })
 
-        document.querySelector('button#the-btn').addEventListener('click', function s(){
+        document.querySelector('button#the-btn').addEventListener('click', function(){
             if (!apiKey){
                 alert('API key is not set!')
                 throw new Error('API key is not set.')
@@ -113,23 +55,35 @@ async function setUpEnv(){
                 alert('Number of keywords is not set!')
                 throw new Error('Number of keywords is not set.')
             }
-            // chrome.action.onClicked.addListener(() =>{
-            //     console.log('im here')
-                // document.querySelector('div.play-stock-auto').addEventListener('click', async function(){
-                //     this.removeEventListener('click', s)
-                //     console.log('pretending to automate')
-                //     await stall(5000)
-                //     console.log('done pretending')
-                //     this.addEventListener('click', s)
-                // })
-            // })
-            //make a listener that toggles this listener on and off upon clicking play
-            console.log('pretending to tag')
-            // loadMetadata(numKeys, aiImages, url, header)
+            loadMetadata(numKeys, aiImages, url, header)
+        })
+
+        chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+            if (message === 'halted'){
+                throw new Error('Program was halted through extension.')
+            }
+            if (message === 'started'){
+                try{
+                    if (!apiKey){
+                        alert('API key is not set!')
+                        throw new Error('API key is not set.')
+                    }
+                    if (!numKeys){
+                        alert('Number of keywords is not set!')
+                        throw new Error('Number of keywords is not set.')
+                    }
+                    await fullAuto(numKeys, aiImages, url, header)
+                    alert("All done!")
+                }catch(err){
+                    alert('Something went wrong!')
+                    console.log(err)
+                }finally{
+                    chrome.runtime.sendMessage('stopped')
+                }
+            }
         })
     }
 }
-
 
 async function getAPIkey(){
     const response = await chrome.storage.sync.get('api')
@@ -148,8 +102,6 @@ async function getAiImages(){
     const aiImages = response.aiImages
     return aiImages
 }
-
-
 
 async function loadMetadata(numKeys, aiImages, url, header){
 
@@ -171,7 +123,51 @@ async function loadMetadata(numKeys, aiImages, url, header){
         checkPeople()
 }
 
+async function fullAuto(numKeys, aiImages, url, header){
+    //throw errors
+    //try catch  - sending message to switch pause to play if finished or stopped abruptly
+    const save = document.querySelector('div.margin-left-small > button.button--action')
+    let next = document.querySelector('ul.the-paginator-list').lastChild.firstChild
+    console.log('entering loop')
 
+    while(next.innerHTML === 'Next'){
+        next = document.querySelector('ul.the-paginator-list').lastChild.firstChild
+        let target = document.querySelector('div[aria-selected="true"]').parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
+
+
+        // await stall(1000)
+        // console.log('metadata-ing')
+
+        while (target.className === 'container-inline-block'){
+            target.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.click()
+
+            while(document.querySelector('div.keywords-input')){
+                await stall(200)
+            }
+            
+            await loadMetadata(numKeys, aiImages, url, header)
+            // checkGenAI()
+
+            // await stall(1000)//metadata-ing
+
+            target = target.nextSibiling
+            await stall(1000)
+        }
+
+        save.click()
+        while(save.innerHTML === "Saving work..."){
+            await stall(200)
+        }
+
+        console.log('metadata saved')
+        
+        next.click()
+        await stall(1000)
+        while (document.querySelector('div[data-t="content-spinner-wrapper"]').style.display === 'block'){
+            await stall(1000)
+        }
+    }
+}
 
 async function makeKeys(numKeys, url, header){
 
