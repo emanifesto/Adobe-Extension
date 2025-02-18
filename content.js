@@ -11,7 +11,7 @@
 
 // document.addEventListener('keypress', function(){
 //     const save = document.querySelector('div.margin-left-small > button.button--action')
-//     console.log(save.innerHTML)
+//     console.log(save.style)
 // })
 
 function stall(ms){
@@ -143,7 +143,7 @@ async function loadMetadata(numKeys, aiImages, url, header){
 async function fullAuto(numKeys, aiImages, url, header){
     //throw errors
     //try catch  - sending message to switch pause to play if finished or stopped abruptly
-    const save = document.querySelector('div.margin-left-small > button.button--action')
+    let save = document.querySelector('div.margin-left-small > button.button--action')
     let next = document.querySelector('ul.the-paginator-list').lastChild.firstChild
     let running = true
     // console.log('entering loop')
@@ -184,8 +184,9 @@ async function fullAuto(numKeys, aiImages, url, header){
             throw new Error('Program halted through extension.')
         }
 
-        save.click()
-        await stall(500)
+        save.click()//#2D8CEB
+        await stall(5000)
+        save = document.querySelector('div.margin-left-small > button.button--action')
         while(save.innerHTML === "Saving work..."){
             await stall(1000)
         }
