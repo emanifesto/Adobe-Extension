@@ -7,6 +7,12 @@ const feedback = document.querySelector('button.feed-btn-orange')
 
 document.addEventListener('DOMContentLoaded', ()=>{
 
+
+    document.addEventListener('click', async function(){
+        const automation = await getAutomation()
+        console.log(automation)
+    })
+
 //chrome-extension://gnapbdecbbnaalohhpcocalcefhlofnk
     chrome.storage.sync.get('api', function(result) {
         if (result.api){
@@ -62,16 +68,26 @@ document.addEventListener('DOMContentLoaded', ()=>{
                     return tab;
                   }
 
+
+                // chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+                //     if (message === 'stopped'){
+                //         icon.className = 'play-stock-auto'
+                //         chrome.storage.sync.set({'automation': null})
+                //     }
+                // })                
+
                 let tab = await getCurrentTab()
                   
                 if (icon.className === 'play-stock-auto'){
-                    chrome.tabs.sendMessage(tab.id, 'started', (response) => {
-                        if (response){
-                            icon.className = 'pause-stock-auto'
-                            chrome.storage.sync.set({'automation': 'running'})
-                        }
-                        else
+                    chrome.tabs.sendMessage(tab.id, 'started', function(response) {
+                        if (!response)
                             alert("Please reload the page.")
+                        else{
+                            if (response.starting){
+                                icon.className = 'pause-stock-auto'
+                                chrome.storage.sync.set({'automation': 'running'})
+                            }
+                        }
                     })
                 }
                 else if (icon.className === 'pause-stock-auto'){

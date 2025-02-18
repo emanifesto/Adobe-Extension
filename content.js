@@ -7,6 +7,10 @@
 
 document.addEventListener('click', setUpEnv())
 
+// document.addEventListener('keypress', function(){
+//     console.log('sending message')
+//     chrome.runtime.sendMessage('stopped')
+// })
 
 
 // document.addEventListener('keypress', function(){
@@ -19,7 +23,7 @@ function stall(ms){
 }
 
 async function setUpEnv(){
-    await stall(2000)
+    await stall(1500)
     if (!document.querySelector('button#the-btn')){
         const button = document.createElement('button');
         const icon = document.createElement("img");
@@ -72,7 +76,7 @@ async function setUpEnv(){
 
         
         chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
-            console.log('got the message')
+            // console.log('got the message')
 
             if (message === 'started'){
                 try{
@@ -84,8 +88,9 @@ async function setUpEnv(){
                         alert('Number of keywords is not set!')
                         throw new Error('Number of keywords is not set.')
                     }
-                    sendResponse({'started': true}); await stall(5000)
-                    // await fullAuto(numKeys, aiImages, url, header)
+                    sendResponse({'starting': 'true'}); await stall(5000)
+                    await fullAuto(numKeys, aiImages, url, header)
+                    chrome.runtime.sendMessage('stopped')
                     alert("All done!")
                 }catch(err){
                     if (err.message === 'Program halted through extension.'){
@@ -95,7 +100,6 @@ async function setUpEnv(){
                         alert('Something went wrong!')
                         console.log(err)
                     }
-                }finally{
                     chrome.runtime.sendMessage('stopped')
                 }
             }
@@ -129,6 +133,10 @@ async function loadMetadata(numKeys, aiImages, url, header){
     const keywords = await makeKeys(numKeys, url, header)
     const title = await makeTitle(keywords, url, header)
 
+    while(document.querySelector('div.keywords-input')){
+        await stall(200)
+    }
+
     const titleBox = document.querySelector('textarea[aria-label="Content title"]')
     const keywordBox = document.querySelector('textarea[aria-label="Paste Keywords..."]')
     titleBox.value = title
@@ -158,11 +166,7 @@ async function fullAuto(numKeys, aiImages, url, header){
 
         while (target.className === 'container-inline-block' && running){
             target.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.click()
-
-            while(document.querySelector('div.keywords-input')){
-                await stall(200)
-            }
-            
+    
             chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 if (message === 'halted'){
                     running = false
@@ -192,7 +196,7 @@ async function fullAuto(numKeys, aiImages, url, header){
             await stall(1000)
         }
 
-        await stall(5000)
+        await stall(2000)
         // console.log('metadata saved')
         
         next.click()
