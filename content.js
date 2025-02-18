@@ -270,7 +270,7 @@ async function makeTitle(keywords, url, header){
         messages: [
             {
                 role: 'system',
-                content: "While under 190 characters, keep adding to the title from the first ten keywords."
+                content: "After making the title; while under 190 characters, keep adding to the title from the first ten keywords."
             },{
                 role: 'user',
                 content: `Analyze the following image keywords and respond with an SEO title. (${keywords})`
