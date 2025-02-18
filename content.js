@@ -1,8 +1,15 @@
 //Aqif the OPP
 
-document.addEventListener('mousemove', function handler(){
-    this.removeEventListener('mousemove', handler)
-    setUpEnv()
+// document.addEventListener('mousemove', function handler(){
+//     this.removeEventListener('mousemove', handler)
+//     setUpEnv()
+// })
+
+document.addEventListener('click', setUpEnv())
+
+document.addEventListener('keypress', function(){
+    const save = document.querySelector('div.margin-left-small > button.button--action')
+    console.log(save.innerHTML)
 })
 
 function stall(ms){
@@ -22,6 +29,8 @@ async function setUpEnv(){
 
         const target = document.querySelector('div.visible');
         target.insertBefore(button, target.firstChild);
+
+        // document.removeEventListener('click', setUpEnv)
 
         let apiKey = await getAPIkey()
         let numKeys = await getNumKeys()
@@ -58,10 +67,10 @@ async function setUpEnv(){
             loadMetadata(numKeys, aiImages, url, header)
         })
 
+        
         chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
-            if (message === 'halted'){
-                throw new Error('Program was halted through extension.')
-            }
+            console.log('got the message')
+
             if (message === 'started'){
                 try{
                     if (!apiKey){
@@ -75,8 +84,13 @@ async function setUpEnv(){
                     await fullAuto(numKeys, aiImages, url, header)
                     alert("All done!")
                 }catch(err){
-                    alert('Something went wrong!')
-                    console.log(err)
+                    if (err.message === 'Program halted through extension.'){
+                        console.log(err.message)
+                    }
+                    else{
+                        alert('Something went wrong!')
+                        console.log(err)
+                    }
                 }finally{
                     chrome.runtime.sendMessage('stopped')
                 }
@@ -128,43 +142,58 @@ async function fullAuto(numKeys, aiImages, url, header){
     //try catch  - sending message to switch pause to play if finished or stopped abruptly
     const save = document.querySelector('div.margin-left-small > button.button--action')
     let next = document.querySelector('ul.the-paginator-list').lastChild.firstChild
-    console.log('entering loop')
+    let running = true
+    // console.log('entering loop')
 
-    while(next.innerHTML === 'Next'){
+    while(next.innerHTML === 'Next' && running){
         next = document.querySelector('ul.the-paginator-list').lastChild.firstChild
         let target = document.querySelector('div[aria-selected="true"]').parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
-
 
         // await stall(1000)
         // console.log('metadata-ing')
 
-        while (target.className === 'container-inline-block'){
+        while (target.className === 'container-inline-block' && running){
             target.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.click()
 
             while(document.querySelector('div.keywords-input')){
                 await stall(200)
             }
             
+            chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+                if (message === 'halted'){
+                    running = false
+                }
+            })
+            if (!running){
+                throw new Error('Program halted through extension.')
+            }
+
             await loadMetadata(numKeys, aiImages, url, header)
             // checkGenAI()
 
             // await stall(1000)//metadata-ing
 
-            target = target.nextSibiling
-            await stall(1000)
+            target = target.nextSibling
+            await stall(500)
+        }
+
+        if (!running){
+            throw new Error('Program halted through extension.')
         }
 
         save.click()
+        await stall(500)
         while(save.innerHTML === "Saving work..."){
-            await stall(200)
+            await stall(1000)
         }
 
-        console.log('metadata saved')
+        // await stall(5000)
+        // console.log('metadata saved')
         
         next.click()
-        await stall(1000)
+        await stall(500)
         while (document.querySelector('div[data-t="content-spinner-wrapper"]').style.display === 'block'){
-            await stall(1000)
+            await stall(500)
         }
     }
 }
@@ -206,7 +235,7 @@ async function makeKeys(numKeys, url, header){
             throw new Error('OpenAI is experiencing issues.')
         }
         const data = await response.json()
-        console.log(data)
+        // console.log(data)
 
         let roughKeys = data.choices[0].message.content
 
@@ -232,7 +261,7 @@ async function makeTitle(keywords, url, header){
         messages: [
             {
                 role: 'system',
-                content: "While under 190 characters, keep adding to the title from the first ten keywords"
+                content: "While under 190 characters, keep adding to the title from the first ten keywords. No surrounding quotes"
             },{
                 role: 'user',
                 content: `Analyze the following image keywords and respond with an SEO title. (${keywords})`
@@ -252,7 +281,7 @@ async function makeTitle(keywords, url, header){
             throw new Error('OpenAI is experiencing issues.')
         }
         const data = await response.json()
-        console.log(data)
+        // console.log(data)
 
         return data.choices[0].message.content
     }catch(err){
@@ -262,7 +291,14 @@ async function makeTitle(keywords, url, header){
 }
 
 function checkGenAI(){
+    const editorial = document.querySelector('input#illustrativeEditorialContent')
     const genAI = document.querySelector('input#content-tagger-generative-ai-checkbox')
+    try{
+        if (editorial.checked)
+            editorial.click()
+    }catch(err){
+        console.log(err)
+    }
     if (!genAI.checked)
         genAI.click()
 }

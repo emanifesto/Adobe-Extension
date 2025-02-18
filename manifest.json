@@ -3,7 +3,7 @@
     "description": "your life is complete now",
     "version": "1.0",
     "manifest_version": 3,
-    "permissions": ["activeTab", "storage", "scripting"],
+    "permissions": ["activeTab", "storage", "scripting", "tabs"],
     "icons":{
         "16":"icon-asma1.png",
         "32":"icon-asma1.png",

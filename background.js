@@ -54,16 +54,25 @@ document.addEventListener('DOMContentLoaded', ()=>{
             const target = document.querySelector('form.footer-sub-feed')
             target.parentNode.insertBefore(btnHolder, target)
 
-            btn.addEventListener('click', function(){
+            btn.addEventListener('click', async function(){
+
+                async function getCurrentTab() {
+                    let queryOptions = { active: true, lastFocusedWindow: true };
+                    let [tab] = await chrome.tabs.query(queryOptions);
+                    return tab;
+                  }
+
+                let tab = await getCurrentTab()
+                  
                 if (icon.className === 'play-stock-auto'){
                     icon.className = 'pause-stock-auto'
                     chrome.storage.sync.set({'automation': 'running'})
-                    chrome.runtime.sendMessage('started')
+                    chrome.tabs.sendMessage(tab.id, 'started')
                 }
                 else if (icon.className === 'pause-stock-auto'){
                     icon.className = 'play-stock-auto'
                     chrome.storage.sync.set({'automation': null})
-                    chrome.runtime.sendMessage('halted')
+                    chrome.tabs.sendMessage(tab.id, 'halted')
                 }
             })
 
@@ -77,7 +86,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     })
 })
 
-chrome.storage.sync.set({'payment': 'none'})
+chrome.storage.sync.set({'payment': 'hands free'})
 
 
 async function getAutomation(){
