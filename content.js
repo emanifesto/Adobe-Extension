@@ -5,23 +5,26 @@
 //     setUpEnv()
 // })
 
-document.addEventListener('click', setUpEnv())
+// document.addEventListener('click', setUpEnv())
 
-document.addEventListener('keypress', function(){
-    const save = document.querySelector('div.margin-left-small > button.button--action')
-    console.log(save.innerHTML)
-})
+
+
+// document.addEventListener('keypress', function(){
+//     const save = document.querySelector('div.margin-left-small > button.button--action')
+//     console.log(save.innerHTML)
+// })
 
 function stall(ms){
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 async function setUpEnv(){
+    await stall(2000)
     if (!document.querySelector('button#the-btn')){
         const button = document.createElement('button');
         const icon = document.createElement("img");
 
-        icon.src = await chrome.runtime.getURL("icons/icon2.png");
+        icon.src = await chrome.runtime.getURL("icon-asma2.png");
         icon.className = 'icon-asma';
 
         button.id = 'the-btn';
@@ -187,7 +190,7 @@ async function fullAuto(numKeys, aiImages, url, header){
             await stall(1000)
         }
 
-        // await stall(5000)
+        await stall(5000)
         // console.log('metadata saved')
         
         next.click()
@@ -261,7 +264,7 @@ async function makeTitle(keywords, url, header){
         messages: [
             {
                 role: 'system',
-                content: "While under 190 characters, keep adding to the title from the first ten keywords. No surrounding quotes"
+                content: "While under 190 characters, keep adding to the title from the first ten keywords."
             },{
                 role: 'user',
                 content: `Analyze the following image keywords and respond with an SEO title. (${keywords})`
@@ -283,7 +286,11 @@ async function makeTitle(keywords, url, header){
         const data = await response.json()
         // console.log(data)
 
-        return data.choices[0].message.content
+        let title = data.choices[0].message.content
+        while (title.length > 200){
+            title = title.substring(0, title.lastIndexOf(" "))
+        }
+        return title
     }catch(err){
         alert('Something went wrong.')
         console.log(err)

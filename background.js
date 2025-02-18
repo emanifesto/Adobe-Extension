@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     })
 })
 
-chrome.storage.sync.set({'payment': 'hands free'})
+chrome.storage.sync.set({'payment': 'none'})
 
 
 async function getAutomation(){

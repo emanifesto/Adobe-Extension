@@ -26,7 +26,7 @@
     ],
     "web_accessible_resources" : [
         {
-            "resources": ["icons/icon2.png"],
+            "resources": ["icon-asma2.png"],
             "matches": ["<all_urls>"]
         }
     ],
