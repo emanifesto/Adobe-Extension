@@ -5,13 +5,13 @@
 //     setUpEnv()
 // })
 
-// document.addEventListener('click', setUpEnv())
+document.addEventListener('click', setUpEnv())
 
 
 
 // document.addEventListener('keypress', function(){
-//     const save = document.querySelector('div.margin-left-small > button.button--action')
-//     console.log(save.style)
+//     const iledco = document.querySelector('input#illustrativeEditorialContent')
+//     console.log(iledco.checked)
 // })
 
 function stall(ms){
@@ -84,7 +84,8 @@ async function setUpEnv(){
                         alert('Number of keywords is not set!')
                         throw new Error('Number of keywords is not set.')
                     }
-                    await fullAuto(numKeys, aiImages, url, header)
+                    sendResponse({'started': true}); await stall(5000)
+                    // await fullAuto(numKeys, aiImages, url, header)
                     alert("All done!")
                 }catch(err){
                     if (err.message === 'Program halted through extension.'){
@@ -301,12 +302,8 @@ async function makeTitle(keywords, url, header){
 function checkGenAI(){
     const editorial = document.querySelector('input#illustrativeEditorialContent')
     const genAI = document.querySelector('input#content-tagger-generative-ai-checkbox')
-    try{
-        if (editorial.checked)
-            editorial.click()
-    }catch(err){
-        console.log(err)
-    }
+    if (editorial.checked)
+        editorial.click()
     if (!genAI.checked)
         genAI.click()
 }

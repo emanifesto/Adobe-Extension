@@ -15,7 +15,8 @@
         "default_icon": "icon-asma1.png"
     },
     "background": {
-        "service_workers": "background.js"
+        "service_worker": "background.js",
+        "type": "module"
     },
     "content_scripts":[
         {

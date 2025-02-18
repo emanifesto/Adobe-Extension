@@ -65,9 +65,14 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 let tab = await getCurrentTab()
                   
                 if (icon.className === 'play-stock-auto'){
-                    icon.className = 'pause-stock-auto'
-                    chrome.storage.sync.set({'automation': 'running'})
-                    chrome.tabs.sendMessage(tab.id, 'started')
+                    chrome.tabs.sendMessage(tab.id, 'started', (response) => {
+                        if (response){
+                            icon.className = 'pause-stock-auto'
+                            chrome.storage.sync.set({'automation': 'running'})
+                        }
+                        else
+                            alert("Please reload the page.")
+                    })
                 }
                 else if (icon.className === 'pause-stock-auto'){
                     icon.className = 'play-stock-auto'
@@ -82,11 +87,16 @@ document.addEventListener('DOMContentLoaded', ()=>{
                     chrome.storage.sync.set({'automation': null})
                 }
             })
+
+            // window.addEventListener('beforeunload', function(){
+            //     icon.className = 'play-stock-auto'
+            //     chrome.storage.sync.set({'automation': null})
+            // })
         }
     })
 })
 
-chrome.storage.sync.set({'payment': 'none'})
+chrome.storage.sync.set({'payment': 'hands free'})
 
 
 async function getAutomation(){
