@@ -134,7 +134,7 @@ async function loadMetadata(numKeys, aiImages, url, header){
     const title = await makeTitle(keywords, url, header)
 
     while(document.querySelector('div.keywords-input')){
-        await stall(200)
+        await stall(500)//zays is set to 200ms
     }
 
     const titleBox = document.querySelector('textarea[aria-label="Content title"]')
@@ -147,6 +147,8 @@ async function loadMetadata(numKeys, aiImages, url, header){
 
     if (aiImages)
         checkPeople()
+
+    await stall(500)
 }
 
 async function fullAuto(numKeys, aiImages, url, header){
@@ -190,11 +192,13 @@ async function fullAuto(numKeys, aiImages, url, header){
         }
 
         save.click()//#2D8CEB
-        await stall(5000)
+        await stall(3000)
         save = document.querySelector('div.margin-left-small > button.button--action')
-        while(save.innerHTML === "Saving work..."){
+        while(save.innerHTML === "Saving work..."){//this works but i also want to try querySelector as the conditional
+            save = document.querySelector('div.margin-left-small > button.button--action')
             await stall(1000)
         }
+        
 
         await stall(2000)
         // console.log('metadata saved')
@@ -204,6 +208,8 @@ async function fullAuto(numKeys, aiImages, url, header){
         while (document.querySelector('div[data-t="content-spinner-wrapper"]').style.display === 'block'){
             await stall(500)
         }
+
+        await stall(1000)
     }
 }
 
