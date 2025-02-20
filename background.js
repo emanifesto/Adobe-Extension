@@ -7,6 +7,7 @@ const feedback = document.querySelector('button.feed-btn-orange')
 
 document.addEventListener('DOMContentLoaded', ()=>{
 
+    // chrome.scripting.registerContentScripts(['content.js'])
 
     document.addEventListener('click', async function(){
         const automation = await getAutomation()
