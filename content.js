@@ -88,19 +88,13 @@ async function setUpEnv(){
                         alert('Number of keywords is not set!')
                         throw new Error('Number of keywords is not set.')
                     }
-                    sendResponse({'starting': 'true'}); await stall(5000)
+                    sendResponse({'starting': 'true'}); //await stall(5000)
                     await fullAuto(numKeys, aiImages, url, header)
                     chrome.runtime.sendMessage('stopped')
                     alert("All done!")
                 }catch(err){
-                    if (err.message === 'Program halted through extension.'){
-                        console.log(err.message)
-                    }
-                    else{
-                        alert('Something went wrong!')
-                        console.log(err)
-                    }
-                    chrome.runtime.sendMessage('stopped')
+                    console.log(err)
+                    await chrome.runtime.sendMessage('stopped')
                 }
             }
         })
@@ -130,11 +124,38 @@ async function loadMetadata(numKeys, aiImages, url, header){
     if(aiImages)
         checkGenAI()
 
-    const keywords = await makeKeys(numKeys, url, header)
-    const title = await makeTitle(keywords, url, header)
+    let keywords = await makeKeys(numKeys, url, header)
+    if (!keywords){
+        console.log('Response failed; retrying keywords.')
+        let retries = 0
+        while (!keywords){
+            if (retries >= 3){
+                alert('OpenAI is experiencing issues. Retried keywords: 3 times.')
+                throw new Error('OpenAI is experiencing issues. Retried keywords: 3 times.')
+            }
+            keywords = await makeKeys(numKeys, url, header)
+            retries++
+            console.log(`Retried keywords ${retries} time(s)`)
+        }
+    }
+
+    let title = await makeTitle(keywords, url, header)
+    if (!title){
+        console.log('Response failed; retrying title.')
+        let retries = 0
+        while (!title){
+            if (retries >= 3){
+                alert('OpenAI is experiencing issues. Retried title: 3 times.')
+                throw new Error('OpenAI is experiencing issues. Retried title: 3 times.')
+            }
+            title = await makeTitle(keywords, url, header)
+            retries++
+            console.log(`Retried title ${retries} time(s)`)
+        }
+    }
 
     while(document.querySelector('div.keywords-input')){
-        await stall(500)//zays is set to 200ms
+        await stall(200)//zays is set to 200ms
     }
 
     const titleBox = document.querySelector('textarea[aria-label="Content title"]')
@@ -246,12 +267,12 @@ async function makeKeys(numKeys, url, header){
             body: JSON.stringify(payload)
         })
         if (!response.ok){
-            alert("OpenAI is experiencing issues!")
+            // alert("OpenAI is experiencing issues!")
             throw new Error('OpenAI is experiencing issues.')
         }
         const data = await response.json()
         // console.log(data)
-
+        
         let roughKeys = data.choices[0].message.content
 
         if (roughKeys[roughKeys.length - 1] === '.')
@@ -265,7 +286,7 @@ async function makeKeys(numKeys, url, header){
             return roughKeys
         }
     }catch(err){
-        alert(`Something went wrong. Try setting up API key and number of keywords.`)
+        // alert(`Something went wrong with keywording.`)
         console.log(err)
     }
 }
@@ -276,7 +297,7 @@ async function makeTitle(keywords, url, header){
         messages: [
             {
                 role: 'system',
-                content: "After making the title; while under 190 characters, keep adding to the title from the first ten keywords."
+                content: "After making the title; while under 190 characters, keep adding to the title from the first ten keywords. No surrounding quotes"
             },{
                 role: 'user',
                 content: `Analyze the following image keywords and respond with an SEO title. (${keywords})`
@@ -292,19 +313,19 @@ async function makeTitle(keywords, url, header){
             'body': JSON.stringify(payload)
         })
         if (!response.ok){
-            alert("OpenAI is experiencing issues!")
+            // alert("OpenAI is experiencing issues!")
             throw new Error('OpenAI is experiencing issues.')
         }
         const data = await response.json()
         // console.log(data)
-
+        
         let title = data.choices[0].message.content
         while (title.length > 200){
             title = title.substring(0, title.lastIndexOf(" "))
         }
         return title
     }catch(err){
-        alert('Something went wrong.')
+        // alert('Something went wrong with titling.')
         console.log(err)
     }
 }

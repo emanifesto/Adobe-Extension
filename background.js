@@ -5,9 +5,18 @@ const subsciprtion = document.querySelector('button.sub-btn-blue')
 const feedback = document.querySelector('button.feed-btn-orange')
 
 
-document.addEventListener('DOMContentLoaded', ()=>{
+document.addEventListener('DOMContentLoaded', async ()=>{
 
-    // chrome.scripting.registerContentScripts(['content.js'])
+    // try{
+    //     await chrome.scripting.registerContentScripts([{
+    //         js: ['content.js'],
+    //         matches: ['https://contributor.stock.adobe.com/en/uploads*'],
+    //         id: 'asma'
+    //     }])
+    // }catch(err){
+    //     console.log(err)
+    // }
+
 
     document.addEventListener('click', async function(){
         const automation = await getAutomation()
@@ -67,7 +76,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
                     let queryOptions = { active: true, lastFocusedWindow: true };
                     let [tab] = await chrome.tabs.query(queryOptions);
                     return tab;
-                  }
+                }
 
 
                 // chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
