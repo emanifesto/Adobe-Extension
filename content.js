@@ -71,7 +71,12 @@ async function setUpEnv(){
                 alert('Number of keywords is not set!')
                 throw new Error('Number of keywords is not set.')
             }
-            loadMetadata(numKeys, aiImages, url, header)
+            try{
+                loadMetadata(numKeys, aiImages, url, header)
+            }catch(err){
+                console.log(err)
+                alert(err)
+            }
         })
 
         
@@ -271,7 +276,7 @@ async function makeKeys(numKeys, url, header){
             throw new Error('OpenAI is experiencing issues.')
         }
         const data = await response.json()
-        // console.log(data)
+        console.log(data)
         
         let roughKeys = data.choices[0].message.content
 
@@ -317,7 +322,7 @@ async function makeTitle(keywords, url, header){
             throw new Error('OpenAI is experiencing issues.')
         }
         const data = await response.json()
-        // console.log(data)
+        console.log(data)
         
         let title = data.choices[0].message.content
         while (title.length > 200){
