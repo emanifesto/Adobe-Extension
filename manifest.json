@@ -19,7 +19,6 @@
     },
     "content_scripts":[
         {
-            "js": ["content.js"],
             "matches": ["https://contributor.stock.adobe.com/en/uploads*"],
             "css": ["styles.css"]
         }

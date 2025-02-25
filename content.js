@@ -4,7 +4,6 @@
 //     this.removeEventListener('mousemove', handler)
 //     setUpEnv()
 // })
-
 document.addEventListener('click', setUpEnv())
 
 // document.addEventListener('keypress', function(){
@@ -42,6 +41,7 @@ async function setUpEnv(){
         let apiKey = await getAPIkey()
         let numKeys = await getNumKeys()
         let aiImages = await getAiImages()
+        let payment = await getPayment()
         const url = 'https://api.openai.com/v1/chat/completions'
         let header = new Headers({
             'Authorization': `Bearer ${apiKey}`,
@@ -60,22 +60,29 @@ async function setUpEnv(){
                 numKeys = changes.keywords['newValue']
             if (changes.aiImages)
                 aiImages = changes.aiImages['newValue']
+            if (changes.payment)
+                payment = changes.payment['newValue']
         })
 
         document.querySelector('button#the-btn').addEventListener('click', function(){
-            if (!apiKey){
-                alert('API key is not set!')
-                throw new Error('API key is not set.')
-            }
-            if (!numKeys){
-                alert('Number of keywords is not set!')
-                throw new Error('Number of keywords is not set.')
-            }
+            console.log(`btw ${payment}`)
             try{
+                if (!payment){
+                    alert('No subscription!')
+                    throw new Error('No subscription.')
+                }
+                if (!apiKey){
+                    alert('API key is not set!')
+                    throw new Error('API key is not set.')
+                }
+                if (!numKeys){
+                    alert('Number of keywords is not set!')
+                    throw new Error('Number of keywords is not set.')
+                }
                 loadMetadata(numKeys, aiImages, url, header)
             }catch(err){
                 console.log(err)
-                alert(err)
+                // alert(err.message)
             }
         })
 
@@ -122,6 +129,12 @@ async function getAiImages(){
     const response = await chrome.storage.sync.get('aiImages')
     const aiImages = response.aiImages
     return aiImages
+}
+
+async function getPayment(){
+    const response = await chrome.storage.sync.get('payment')
+    const payment = response.payment
+    return payment
 }
 
 async function loadMetadata(numKeys, aiImages, url, header){
@@ -218,7 +231,7 @@ async function fullAuto(numKeys, aiImages, url, header){
         }
 
         save.click()//#2D8CEB
-        await stall(3000)
+        await stall(1000)
         save = document.querySelector('div.margin-left-small > button.button--action')
         while(save.innerHTML === "Saving work..."){//this works but i also want to try querySelector as the conditional
             save = document.querySelector('div.margin-left-small > button.button--action')
@@ -276,7 +289,7 @@ async function makeKeys(numKeys, url, header){
             throw new Error('OpenAI is experiencing issues.')
         }
         const data = await response.json()
-        console.log(data)
+        // console.log(data)
         
         let roughKeys = data.choices[0].message.content
 
@@ -322,7 +335,7 @@ async function makeTitle(keywords, url, header){
             throw new Error('OpenAI is experiencing issues.')
         }
         const data = await response.json()
-        console.log(data)
+        // console.log(data)
         
         let title = data.choices[0].message.content
         while (title.length > 200){

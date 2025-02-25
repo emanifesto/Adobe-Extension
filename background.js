@@ -7,21 +7,20 @@ const feedback = document.querySelector('button.feed-btn-orange')
 
 document.addEventListener('DOMContentLoaded', async ()=>{
 
-    // try{
-    //     await chrome.scripting.registerContentScripts([{
-    //         js: ['content.js'],
-    //         matches: ['https://contributor.stock.adobe.com/en/uploads*'],
-    //         id: 'asma'
-    //     }])
-    // }catch(err){
-    //     console.log(err)
-    // }
+    // document.addEventListener('click', async function(){
+    //     await chrome.storage.sync.set({'payment': 'hands free'})
+    // })
 
+    // document.addEventListener('keypress', async function(){
+    //     await chrome.storage.sync.set({'payment': null})
+    // })
 
-    document.addEventListener('click', async function(){
-        const automation = await getAutomation()
-        console.log(automation)
-    })
+    // document.addEventListener('keypress', async function(){
+    //     const scripts = await chrome.scripting.getRegisteredContentScripts()
+    //     if (scripts.length > 0){
+    //         await chrome.scripting.unregisterContentScripts()
+    //     }
+    // })
 
 //chrome-extension://gnapbdecbbnaalohhpcocalcefhlofnk
     chrome.storage.sync.get('api', function(result) {
@@ -44,86 +43,102 @@ document.addEventListener('DOMContentLoaded', async ()=>{
 
 
     chrome.storage.sync.get('payment', async (result) => {
-        if (result.payment === 'none'){
+        if (!result.payment){
             document.querySelector('p.text-upg-prem').innerHTML = 'Upgrade to premium for full automation.'
-        }
-        if (result.payment === 'hands free'){
+        }else{
+            let tab = await getCurrentTab()
+            let scripts = await chrome.scripting.getRegisteredContentScripts()
 
-            document.querySelector('p.text-upg-prem').style.display = 'none'
-
-            const btnHolder = document.createElement('form')
-            btnHolder.className = 'automate-btn-holder'
-
-            const btn = document.createElement('button')
-            btn.className = 'hands-free'
-
-            const icon = document.createElement('div')
-            let response = await chrome.storage.sync.get('automation')
-            if (response.automation)
-                icon.className = 'pause-stock-auto'
-            else
-                icon.className = 'play-stock-auto'
-
-            btn.appendChild(icon)
-            btnHolder.appendChild(btn)
-
-            const target = document.querySelector('form.footer-sub-feed')
-            target.parentNode.insertBefore(btnHolder, target)
-
-            btn.addEventListener('click', async function(){
-
-                async function getCurrentTab() {
-                    let queryOptions = { active: true, lastFocusedWindow: true };
-                    let [tab] = await chrome.tabs.query(queryOptions);
-                    return tab;
+            if (scripts.length === 0){
+                try{
+                    await chrome.scripting.registerContentScripts([{
+                        js: ['content.js'],
+                        matches: ['https://contributor.stock.adobe.com/en/uploads*'],
+                        id: 'asma'
+                    }])
+                }catch(err){
+                    console.log(err)
                 }
 
+                await chrome.scripting.insertCSS({
+                    target: {tabId: tab.id, allFrames: true},
+                    css: "styles.css",
+                })
+                
+                await chrome.scripting.executeScript({
+                    target: {tabId: tab.id, allFrames: true},
+                    files: ["content.js"],
+                })
+            }
+            // if (scripts[0].id === 'asma')
+            //     console.log('tu madre mama guevo glugluglu')
 
-                // chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
-                //     if (message === 'stopped'){
-                //         icon.className = 'play-stock-auto'
-                //         chrome.storage.sync.set({'automation': null})
-                //     }
-                // })                
+            if (result.payment === 'button'){
+                document.querySelector('p.text-upg-prem').innerHTML = 'Upgrade to premium for full automation.'
+            }
+            else if (result.payment === 'hands free'){
 
-                let tab = await getCurrentTab()
-                  
-                if (icon.className === 'play-stock-auto'){
-                    chrome.tabs.sendMessage(tab.id, 'started', function(response) {
-                        if (!response)
-                            alert("Please reload the page.")
-                        else{
-                            if (response.starting){
-                                icon.className = 'pause-stock-auto'
-                                chrome.storage.sync.set({'automation': 'running'})
+                document.querySelector('p.text-upg-prem').style.display = 'none'
+
+                const btnHolder = document.createElement('form')
+                btnHolder.className = 'automate-btn-holder'
+
+                const btn = document.createElement('button')
+                btn.className = 'hands-free'
+
+                const icon = document.createElement('div')
+                let response = await chrome.storage.sync.get('automation')
+                if (response.automation)
+                    icon.className = 'pause-stock-auto'
+                else
+                    icon.className = 'play-stock-auto'
+
+                btn.appendChild(icon)
+                btnHolder.appendChild(btn)
+
+                const target = document.querySelector('form.footer-sub-feed')
+                target.parentNode.insertBefore(btnHolder, target)
+
+                btn.addEventListener('click', async function(){
+                    tab = await getCurrentTab()
+                    
+                    if (icon.className === 'play-stock-auto'){
+                        chrome.tabs.sendMessage(tab.id, 'started', function(response) {
+                            if (!response)
+                                alert("Please reload the page.")
+                            else{
+                                if (response.starting){
+                                    icon.className = 'pause-stock-auto'
+                                    chrome.storage.sync.set({'automation': 'running'})
+                                }
                             }
-                        }
-                    })
-                }
-                else if (icon.className === 'pause-stock-auto'){
-                    icon.className = 'play-stock-auto'
-                    chrome.storage.sync.set({'automation': null})
-                    chrome.tabs.sendMessage(tab.id, 'halted')
-                }
-            })
+                        })
+                    }
+                    else if (icon.className === 'pause-stock-auto'){
+                        icon.className = 'play-stock-auto'
+                        chrome.storage.sync.set({'automation': null})
+                        chrome.tabs.sendMessage(tab.id, 'halted')
+                    }
+                })
 
-            chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-                if (message === 'stopped'){
-                    icon.className = 'play-stock-auto'
-                    chrome.storage.sync.set({'automation': null})
-                }
-            })
-
-            // window.addEventListener('beforeunload', function(){
-            //     icon.className = 'play-stock-auto'
-            //     chrome.storage.sync.set({'automation': null})
-            // })
+                chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+                    if (message === 'stopped'){
+                        icon.className = 'play-stock-auto'
+                        chrome.storage.sync.set({'automation': null})
+                    }
+                })
+            }
         }
     })
 })
 
 chrome.storage.sync.set({'payment': 'hands free'})
 
+async function getCurrentTab() {
+    let queryOptions = { active: true, lastFocusedWindow: true };
+    let [tab] = await chrome.tabs.query(queryOptions);
+    return tab;
+}
 
 async function getAutomation(){
     const response = await chrome.storage.sync.get('automation')
@@ -155,3 +170,22 @@ aiOnly.addEventListener('click', function(){
     else
         chrome.storage.sync.set({'aiImages': null})
 })
+
+// async function permitAccess(){
+//     let scripts = await chrome.scripting.getRegisteredContentScripts()
+//     console.log(scripts)
+//     if (scripts.length === 0){
+
+//         try{
+//             await chrome.scripting.registerContentScripts([{
+//                 js: ['content.js'],
+//                 matches: ['https://contributor.stock.adobe.com/en/uploads*'],
+//                 id: 'asma'
+//             }])
+//         }catch(err){
+//             console.log(err)
+//         }
+//         scripts = await chrome.scripting.getRegisteredContentScripts()
+//         console.log(scripts)
+//     }
+// }
