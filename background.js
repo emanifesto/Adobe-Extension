@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
                 btn.appendChild(icon)
                 btnHolder.appendChild(btn)
 
-                const target = document.querySelector('form.footer-sub-feed')
+                const target = document.querySelector('div.footer-sub-feed')
                 target.parentNode.insertBefore(btnHolder, target)
 
                 btn.addEventListener('click', async function(){
