@@ -1,7 +1,7 @@
 const saveAPI = document.getElementById("save-api")
 const saveNum = document.getElementById('save-num')
 const aiOnly = document.querySelector('input.check-ai-only')
-const subsciprtion = document.querySelector('button.sub-btn-blue')
+const subscription = document.querySelector('button.sub-btn-blue')
 const feedback = document.querySelector('button.feed-btn-orange')
 
 
@@ -169,6 +169,10 @@ aiOnly.addEventListener('click', function(){
         chrome.storage.sync.set({'aiImages': "true"})
     else
         chrome.storage.sync.set({'aiImages': null})
+})
+
+subscription.addEventListener('click', function(){
+    chrome.tabs.create({ url: "https://damisaas.com/asma/pricing"})
 })
 
 // async function permitAccess(){

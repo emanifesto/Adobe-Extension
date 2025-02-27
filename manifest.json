@@ -5,14 +5,14 @@
     "manifest_version": 3,
     "permissions": ["activeTab", "storage", "scripting", "tabs"],
     "icons":{
-        "16":"icon-asma1.png",
-        "32":"icon-asma1.png",
-        "48":"icon-asma1.png",
-        "128":"icon-asma1.png"
+        "16":"icon-asma3.png",
+        "32":"icon-asma3.png",
+        "48":"icon-asma3.png",
+        "128":"icon-asma3.png"
     },
     "action":{
         "default_popup": "popup.html",
-        "default_icon": "icon-asma1.png"
+        "default_icon": "icon-asma3.png"
     },
     "background": {
         "service_workers": "background.js"
@@ -31,8 +31,5 @@
     ],
     "host_permissions": [
         "https://api.openai.com/v1/chat/completions/"
-    ],
-    "content-security-policy": {
-        "extension_pages": "script-src 'self' 'wasm-unsafe-eval' 'inline-speculation-rules' https://js.stripe.com/v3/pricing-table.js"
-    }
+    ]
 }
