@@ -19,7 +19,7 @@
     },
     "content_scripts":[
         {
-            "matches": ["https://contributor.stock.adobe.com/en/uploads*"],
+            "matches": ["https://contributor.stock.adobe.com/*/uploads*"],
             "css": ["styles.css"]
         }
     ],

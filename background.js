@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
                 try{
                     await chrome.scripting.registerContentScripts([{
                         js: ['content.js'],
-                        matches: ['https://contributor.stock.adobe.com/en/uploads*'],
+                        matches: ['https://contributor.stock.adobe.com/*/uploads*'],
                         id: 'asma'
                     }])
                 }catch(err){
