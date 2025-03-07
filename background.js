@@ -5,22 +5,15 @@ const subscription = document.querySelector('button.sub-btn-blue')
 const feedback = document.querySelector('button.feed-btn-orange')
 
 
+
 document.addEventListener('DOMContentLoaded', async ()=>{
 
-    // document.addEventListener('click', async function(){
-    //     await chrome.storage.sync.set({'payment': 'hands free'})
-    // })
+    const {asmaID} = await chrome.storage.sync.get('asmaID')
 
-    // document.addEventListener('keypress', async function(){
-    //     await chrome.storage.sync.set({'payment': null})
-    // })
-
-    // document.addEventListener('keypress', async function(){
-    //     const scripts = await chrome.scripting.getRegisteredContentScripts()
-    //     if (scripts.length > 0){
-    //         await chrome.scripting.unregisterContentScripts()
-    //     }
-    // })
+    if(!asmaID){
+        const newID = crypto.randomUUID()
+        chrome.storage.sync.set({asmaID: `${newID}`})
+    }
 
 //chrome-extension://gnapbdecbbnaalohhpcocalcefhlofnk
     chrome.storage.sync.get('api', function(result) {
@@ -41,10 +34,22 @@ document.addEventListener('DOMContentLoaded', async ()=>{
         }
     })
 
+    //new logic
+    try{
+        const response = await fetch("https://damisaas.com/asma/api/user", {
+            'method': 'GET',
+            'headers': new Headers({'Authorization': `Bearer ${asmaID}`}),
+            'body': JSON.stringify({info: "payment"})
+        })
+        const data = response.json()
+        await chrome.storage.sync.set({payment: `${data}`})
+    }catch(err){
+        console.log(err)
+    }
 
     chrome.storage.sync.get('payment', async (result) => {
         if (!result.payment){
-            document.querySelector('p.text-upg-prem').innerHTML = 'Upgrade to premium for full automation.'
+            document.querySelector('p.text-upg-prem').innerHTML = 'Subscribe now to start your journey.'
         }else{
             let tab = await getCurrentTab()
             let scripts = await chrome.scripting.getRegisteredContentScripts()
@@ -74,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
             //     console.log('tu madre mama guevo glugluglu')
 
             if (result.payment === 'button'){
-                document.querySelector('p.text-upg-prem').innerHTML = 'Upgrade to premium for full automation.'
+                document.querySelector('p.text-upg-prem').innerHTML = 'Upgrade subscription for full automation.'
             }
             else if (result.payment === 'hands free'){
 
@@ -132,7 +137,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     })
 })
 
-chrome.storage.sync.set({'payment': 'hands free'})
+// chrome.storage.sync.set({'payment': 'hands free'})
 
 async function getCurrentTab() {
     let queryOptions = { active: true, lastFocusedWindow: true };
@@ -171,8 +176,10 @@ aiOnly.addEventListener('click', function(){
         chrome.storage.sync.set({'aiImages': null})
 })
 
-subscription.addEventListener('click', function(){
-    chrome.tabs.create({ url: "https://damisaas.com/asma/pricing"})
+subscription.addEventListener('click', async function(){
+    const response = await chrome.storage.sync.get('asmaID')
+    const asmaID = response.asmaID
+    chrome.tabs.create({ url: `https://damisaas.com/asma/pricing?${asmaID}`})
 })
 
 // async function permitAccess(){
