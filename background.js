@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     //new logic
     try{
         const response = await fetch("https://damisaas.com/asma/api/user", {
-            'method': 'GET',
+            'method': 'POST',
             'headers': new Headers({'Authorization': `Bearer ${asmaID}`}),
             'body': JSON.stringify({info: "payment"})
         })
