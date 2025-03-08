@@ -41,6 +41,7 @@ async function setUpEnv(){
         let apiKey = await getAPIkey()
         let numKeys = await getNumKeys()
         let aiImages = await getAiImages()
+        let releases = await getNoReleases()
         let payment = await getPayment()
         const url = 'https://api.openai.com/v1/chat/completions'
         let header = new Headers({
@@ -62,10 +63,12 @@ async function setUpEnv(){
                 aiImages = changes.aiImages['newValue']
             if (changes.payment)
                 payment = changes.payment['newValue']
+            if (changes.releases)
+                releases = changes.releases['newValue']
         })
 
         document.querySelector('button#the-btn').addEventListener('click', function(){
-            console.log(`btw ${payment}`)
+
             try{
                 if (!payment){
                     alert('No subscription!')
@@ -79,7 +82,7 @@ async function setUpEnv(){
                     alert('Number of keywords is not set!')
                     throw new Error('Number of keywords is not set.')
                 }
-                loadMetadata(numKeys, aiImages, url, header)
+                loadMetadata(numKeys, aiImages, releases, url, header)
             }catch(err){
                 console.log(err)
                 // alert(err.message)
@@ -101,7 +104,7 @@ async function setUpEnv(){
                         throw new Error('Number of keywords is not set.')
                     }
                     sendResponse({'starting': 'true'}); //await stall(5000)
-                    await fullAuto(numKeys, aiImages, url, header)
+                    await fullAuto(numKeys, aiImages, releases, url, header)
                     chrome.runtime.sendMessage('stopped')
                     alert("All done!")
                 }catch(err){
@@ -131,13 +134,23 @@ async function getAiImages(){
     return aiImages
 }
 
+async function getNoReleases(){
+    const {releases} = await chrome.storage.sync.get('releases')
+    return releases
+}
+
 async function getPayment(){
     const response = await chrome.storage.sync.get('payment')
     const payment = response.payment
     return payment
 }
 
-async function loadMetadata(numKeys, aiImages, url, header){
+
+
+async function loadMetadata(numKeys, aiImages, releases, url, header){
+    
+    if (releases)
+        checkNoReleases()
 
     if(aiImages)
         checkGenAI()
@@ -190,7 +203,7 @@ async function loadMetadata(numKeys, aiImages, url, header){
     await stall(500)
 }
 
-async function fullAuto(numKeys, aiImages, url, header){
+async function fullAuto(numKeys, aiImages, releases, url, header){
     //throw errors
     //try catch  - sending message to switch pause to play if finished or stopped abruptly
     let save = document.querySelector('div.margin-left-small > button.button--action')
@@ -217,7 +230,7 @@ async function fullAuto(numKeys, aiImages, url, header){
                 throw new Error('Program halted through extension.')
             }
 
-            await loadMetadata(numKeys, aiImages, url, header)
+            await loadMetadata(numKeys, aiImages, releases, url, header)
             // checkGenAI()
 
             // await stall(1000)//metadata-ing
@@ -361,4 +374,11 @@ function checkPeople(){
     const people = document.querySelector("input#content-tagger-generative-ai-property-release-checkbox")
     if (!people.checked)
         people.click()
+}
+
+function checkNoReleases(){
+    console.log('clicking')
+    const releases = document.querySelector('input[data-t="has-release-no"]')
+    if (releases)
+        releases.click()
 }

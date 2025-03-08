@@ -1,6 +1,7 @@
 const saveAPI = document.getElementById("save-api")
 const saveNum = document.getElementById('save-num')
 const aiOnly = document.querySelector('input.check-ai-only')
+const releases = document.querySelector('input.releases-check')
 const subscription = document.querySelector('button.sub-btn-blue')
 const feedback = document.querySelector('button.feed-btn-orange')
 
@@ -9,7 +10,7 @@ const feedback = document.querySelector('button.feed-btn-orange')
 document.addEventListener('DOMContentLoaded', async ()=>{
 
     const {asmaID} = await chrome.storage.sync.get('asmaID')
- 
+
     if(!asmaID){
         const newID = crypto.randomUUID()
         chrome.storage.sync.set({asmaID: `${newID}`})
@@ -32,6 +33,11 @@ document.addEventListener('DOMContentLoaded', async ()=>{
         if(result.aiImages){
             aiOnly.checked = true
         }
+    })
+
+    chrome.storage.sync.get('releases', (result) => {
+        if (result.releases)
+            releases.checked = true
     })
 
     //new logic
@@ -174,6 +180,13 @@ aiOnly.addEventListener('click', function(){
         chrome.storage.sync.set({'aiImages': "true"})
     else
         chrome.storage.sync.set({'aiImages': null})
+})
+
+releases.addEventListener('click', function(){
+    if (releases.checked)
+        chrome.storage.sync.set({'releases': 'no'})
+    else
+        chrome.storage.sync.set({'releases': null})
 })
 
 subscription.addEventListener('click', async function(){
