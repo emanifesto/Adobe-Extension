@@ -32,7 +32,7 @@ h1{
     color:aliceblue;
 }
 
-.api-quest-form, .num-keywords, .footer-sub-feed, .ai-only-query, .automate-btn-holder{
+.api-quest-form, .num-keywords, .footer-sub-feed, .ai-only-query, .automate-btn-holder, .releases-query{
     letter-spacing: inherit;
     font-family: inherit;
     cursor: default;
@@ -76,13 +76,18 @@ h1{
 }
 
 .check-ai-only{
-    margin: 15px 0 15px 10px;
+    margin: 10px 0 10px 10px;
+    cursor: pointer;
+}
+
+.releases-check{
+    margin: 10px 0 10px 18.5px;
     cursor: pointer;
 }
 
 .line-border-sepa{
-    margin: 0 auto;
-    width:90%;
+    margin: 5px auto 0;
+    width: 90%;
     height: 2px;
     background-color: #404040;
 }
@@ -132,6 +137,11 @@ h1{
     transform: scale(1.1);
     background-image: linear-gradient(to left, #3b71ff, #1da5ff);
     /* background-image: linear-gradient(to left, #713bff, #a51dff) */
+}
+
+a{
+    color: inherit;
+    text-decoration-line: none;
 }
 
 .hands-free{
