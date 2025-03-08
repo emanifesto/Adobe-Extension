@@ -9,7 +9,7 @@ const feedback = document.querySelector('button.feed-btn-orange')
 document.addEventListener('DOMContentLoaded', async ()=>{
 
     const {asmaID} = await chrome.storage.sync.get('asmaID')
-
+ 
     if(!asmaID){
         const newID = crypto.randomUUID()
         chrome.storage.sync.set({asmaID: `${newID}`})
@@ -41,14 +41,14 @@ document.addEventListener('DOMContentLoaded', async ()=>{
             'headers': new Headers({'Authorization': `Bearer ${asmaID}`}),
             'body': JSON.stringify({info: "payment"})
         })
-        const data = response.json()
-        await chrome.storage.sync.set({payment: `${data}`})
+        const data = await response.json()
+        await chrome.storage.sync.set({payment: `${data.payment}`})
     }catch(err){
         console.log(err)
     }
 
     chrome.storage.sync.get('payment', async (result) => {
-        if (!result.payment){
+        if (result.payment === "null"){
             document.querySelector('p.text-upg-prem').innerHTML = 'Subscribe now to start your journey.'
         }else{
             let tab = await getCurrentTab()
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
             // if (scripts[0].id === 'asma')
             //     console.log('tu madre mama guevo glugluglu')
 
-            if (result.payment === 'button'){
+            if (result.payment === 'metadata button'){
                 document.querySelector('p.text-upg-prem').innerHTML = 'Upgrade subscription for full automation.'
             }
             else if (result.payment === 'hands free'){
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     })
 })
 
-// chrome.storage.sync.set({'payment': 'hands free'})
+
 
 async function getCurrentTab() {
     let queryOptions = { active: true, lastFocusedWindow: true };
