@@ -194,10 +194,6 @@ subscription.addEventListener('click', async function(){
     const asmaID = response.asmaID
     chrome.tabs.create({ url: `https://damisaas.com/asma/pricing?${asmaID}`})
 })
-
-feedback.addEventListener('click', function(){
-    window.location.href = "https://google.com"
-})
 // async function permitAccess(){
 //     let scripts = await chrome.scripting.getRegisteredContentScripts()
 //     console.log(scripts)
