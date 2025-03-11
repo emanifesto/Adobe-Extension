@@ -3,9 +3,6 @@ const saveNum = document.getElementById('save-num')
 const aiOnly = document.querySelector('input.check-ai-only')
 const releases = document.querySelector('input.releases-check')
 const subscription = document.querySelector('button.sub-btn-blue')
-const feedback = document.querySelector('button.feed-btn-orange')
-
-
 
 document.addEventListener('DOMContentLoaded', async ()=>{
 
@@ -16,7 +13,6 @@ document.addEventListener('DOMContentLoaded', async ()=>{
         chrome.storage.sync.set({asmaID: `${newID}`})
     }
 
-//chrome-extension://gnapbdecbbnaalohhpcocalcefhlofnk
     chrome.storage.sync.get('api', function(result) {
         if (result.api){
             document.getElementById('api-text-box').value = result.api;
@@ -40,7 +36,6 @@ document.addEventListener('DOMContentLoaded', async ()=>{
             releases.checked = true
     })
 
-    //new logic
     try{
         const response = await fetch("https://damisaas.com/asma/api/user", {
             'method': 'POST',
@@ -67,22 +62,20 @@ document.addEventListener('DOMContentLoaded', async ()=>{
                         matches: ['https://contributor.stock.adobe.com/*/uploads*'],
                         id: 'asma'
                     }])
+
+                    await chrome.scripting.insertCSS({
+                        target: {tabId: tab.id, allFrames: true},
+                        css: "styles.css",
+                    })
+                    
+                    await chrome.scripting.executeScript({
+                        target: {tabId: tab.id, allFrames: true},
+                        files: ["content.js"],
+                    })
                 }catch(err){
                     console.log(err)
                 }
-
-                await chrome.scripting.insertCSS({
-                    target: {tabId: tab.id, allFrames: true},
-                    css: "styles.css",
-                })
-                
-                await chrome.scripting.executeScript({
-                    target: {tabId: tab.id, allFrames: true},
-                    files: ["content.js"],
-                })
             }
-            // if (scripts[0].id === 'asma')
-            //     console.log('tu madre mama guevo glugluglu')
 
             if (result.payment === 'metadata button'){
                 document.querySelector('p.text-upg-prem').innerHTML = 'Upgrade subscription for full automation.'
@@ -143,8 +136,6 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     })
 })
 
-
-
 async function getCurrentTab() {
     let queryOptions = { active: true, lastFocusedWindow: true };
     let [tab] = await chrome.tabs.query(queryOptions);
@@ -194,21 +185,3 @@ subscription.addEventListener('click', async function(){
     const asmaID = response.asmaID
     chrome.tabs.create({ url: `https://damisaas.com/asma/pricing?${asmaID}`})
 })
-// async function permitAccess(){
-//     let scripts = await chrome.scripting.getRegisteredContentScripts()
-//     console.log(scripts)
-//     if (scripts.length === 0){
-
-//         try{
-//             await chrome.scripting.registerContentScripts([{
-//                 js: ['content.js'],
-//                 matches: ['https://contributor.stock.adobe.com/en/uploads*'],
-//                 id: 'asma'
-//             }])
-//         }catch(err){
-//             console.log(err)
-//         }
-//         scripts = await chrome.scripting.getRegisteredContentScripts()
-//         console.log(scripts)
-//     }
-// }

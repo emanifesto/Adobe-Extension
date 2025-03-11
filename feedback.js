@@ -45,8 +45,4 @@ document.addEventListener('DOMContentLoaded', async function(){
             }
         }
     })
-})  
-
-// function stall(ms){
-//     return new Promise(resolve => setTimeout(resolve, ms))
-// }
+})

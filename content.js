@@ -1,21 +1,6 @@
 //Aqif the OPP
 
-// document.addEventListener('mousemove', function handler(){
-//     this.removeEventListener('mousemove', handler)
-//     setUpEnv()
-// })
 document.addEventListener('click', setUpEnv())
-
-// document.addEventListener('keypress', function(){
-//     console.log('sending message')
-//     chrome.runtime.sendMessage('stopped')
-// })
-
-
-// document.addEventListener('keypress', function(){
-//     const iledco = document.querySelector('input#illustrativeEditorialContent')
-//     console.log(iledco.checked)
-// })
 
 function stall(ms){
     return new Promise(resolve => setTimeout(resolve, ms))
@@ -35,8 +20,6 @@ async function setUpEnv(){
 
         const target = document.querySelector('div.visible');
         target.insertBefore(button, target.firstChild);
-
-        // document.removeEventListener('click', setUpEnv)
 
         let apiKey = await getAPIkey()
         let numKeys = await getNumKeys()
@@ -70,7 +53,7 @@ async function setUpEnv(){
         document.querySelector('button#the-btn').addEventListener('click', function(){
 
             try{
-                if (!payment){
+                if (payment === "null"){
                     alert('No subscription!')
                     throw new Error('No subscription.')
                 }
@@ -85,13 +68,11 @@ async function setUpEnv(){
                 loadMetadata(numKeys, aiImages, releases, url, header)
             }catch(err){
                 console.log(err)
-                // alert(err.message)
             }
         })
 
         
         chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
-            // console.log('got the message')
 
             if (message === 'started'){
                 try{
@@ -103,7 +84,7 @@ async function setUpEnv(){
                         alert('Number of keywords is not set!')
                         throw new Error('Number of keywords is not set.')
                     }
-                    sendResponse({'starting': 'true'}); //await stall(5000)
+                    sendResponse({'starting': 'true'});
                     await fullAuto(numKeys, aiImages, releases, url, header)
                     chrome.runtime.sendMessage('stopped')
                     alert("All done!")
@@ -145,8 +126,6 @@ async function getPayment(){
     return payment
 }
 
-
-
 async function loadMetadata(numKeys, aiImages, releases, url, header){
     
     if (releases)
@@ -186,7 +165,7 @@ async function loadMetadata(numKeys, aiImages, releases, url, header){
     }
 
     while(document.querySelector('div.keywords-input')){
-        await stall(200)//zays is set to 200ms
+        await stall(200)
     }
 
     const titleBox = document.querySelector('textarea[aria-label="Content title"]')
@@ -204,19 +183,14 @@ async function loadMetadata(numKeys, aiImages, releases, url, header){
 }
 
 async function fullAuto(numKeys, aiImages, releases, url, header){
-    //throw errors
-    //try catch  - sending message to switch pause to play if finished or stopped abruptly
+
     let save = document.querySelector('div.margin-left-small > button.button--action')
     let next = document.querySelector('ul.the-paginator-list').lastChild.firstChild
     let running = true
-    // console.log('entering loop')
 
     while(next.innerHTML === 'Next' && running){
         next = document.querySelector('ul.the-paginator-list').lastChild.firstChild
         let target = document.querySelector('div[aria-selected="true"]').parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
-
-        // await stall(1000)
-        // console.log('metadata-ing')
 
         while (target.className === 'container-inline-block' && running){
             target.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.click()
@@ -231,9 +205,6 @@ async function fullAuto(numKeys, aiImages, releases, url, header){
             }
 
             await loadMetadata(numKeys, aiImages, releases, url, header)
-            // checkGenAI()
-
-            // await stall(1000)//metadata-ing
 
             target = target.nextSibling
             await stall(500)
@@ -243,24 +214,21 @@ async function fullAuto(numKeys, aiImages, releases, url, header){
             throw new Error('Program halted through extension.')
         }
 
-        save.click()//#2D8CEB
+        save.click()
         await stall(1000)
         save = document.querySelector('div.margin-left-small > button.button--action')
-        while(save.innerHTML === "Saving work..."){//this works but i also want to try querySelector as the conditional
+        while(save.innerHTML === "Saving work..."){
             save = document.querySelector('div.margin-left-small > button.button--action')
             await stall(1000)
         }
         
-
         await stall(2000)
-        // console.log('metadata saved')
         
         next.click()
         await stall(500)
         while (document.querySelector('div[data-t="content-spinner-wrapper"]').style.display === 'block'){
             await stall(500)
         }
-
         await stall(1000)
     }
 }
@@ -274,7 +242,7 @@ async function makeKeys(numKeys, url, header){
         messages: [
             {
                 role: 'system',
-                content: "Prioritize short-tail keywords and don't repeat the same words"//"You are the best SEO tool in the world. You make content easy to find in the Adobe Stock search algorithm.",
+                content: "Prioritize short-tail keywords and don't repeat the same words"
             },
             {
                 role: 'user',
@@ -298,11 +266,9 @@ async function makeKeys(numKeys, url, header){
             body: JSON.stringify(payload)
         })
         if (!response.ok){
-            // alert("OpenAI is experiencing issues!")
             throw new Error('OpenAI is experiencing issues.')
         }
         const data = await response.json()
-        // console.log(data)
         
         let roughKeys = data.choices[0].message.content
 
@@ -317,7 +283,6 @@ async function makeKeys(numKeys, url, header){
             return roughKeys
         }
     }catch(err){
-        // alert(`Something went wrong with keywording.`)
         console.log(err)
     }
 }
@@ -335,8 +300,7 @@ async function makeTitle(keywords, url, header){
             }
         ]
     }
-//While under 190 characters, keep adding to the title from the first ten keywords.
-//ALWAYS include the first 10 keywords and don't go over 200 characters
+
     try{
         const response = await fetch(url, {
             'method': 'POST',
@@ -344,11 +308,9 @@ async function makeTitle(keywords, url, header){
             'body': JSON.stringify(payload)
         })
         if (!response.ok){
-            // alert("OpenAI is experiencing issues!")
             throw new Error('OpenAI is experiencing issues.')
         }
         const data = await response.json()
-        // console.log(data)
         
         let title = data.choices[0].message.content
         while (title.length > 200){
@@ -356,7 +318,6 @@ async function makeTitle(keywords, url, header){
         }
         return title
     }catch(err){
-        // alert('Something went wrong with titling.')
         console.log(err)
     }
 }
@@ -377,7 +338,6 @@ function checkPeople(){
 }
 
 function checkNoReleases(){
-    console.log('clicking')
     const releases = document.querySelector('input[data-t="has-release-no"]')
     if (releases)
         releases.click()
