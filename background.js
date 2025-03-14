@@ -112,6 +112,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
                                 alert("Please reload the page.")
                             else{
                                 if (response.starting){
+                                    chrome.power.requestKeepAwake('display')
                                     icon.className = 'pause-stock-auto'
                                     chrome.storage.sync.set({'automation': 'running'})
                                 }
@@ -121,14 +122,16 @@ document.addEventListener('DOMContentLoaded', async ()=>{
                     else if (icon.className === 'pause-stock-auto'){
                         icon.className = 'play-stock-auto'
                         chrome.storage.sync.set({'automation': null})
-                        chrome.tabs.sendMessage(tab.id, 'halted')
                     }
                 })
 
-                chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-                    if (message === 'stopped'){
-                        icon.className = 'play-stock-auto'
-                        chrome.storage.sync.set({'automation': null})
+                chrome.storage.onChanged.addListener((changes) => {
+                    if (changes.automation){
+                        if (changes.automation['newValue'] === null){
+                            chrome.power.releaseKeepAwake()
+                            chrome.tabs.sendMessage(tab.id, 'halted')
+                            icon.className = 'play-stock-auto'
+                        }
                     }
                 })
             }

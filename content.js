@@ -32,7 +32,7 @@ async function setUpEnv(){
             'Content-Type': 'application/json'
         })
 
-        chrome.storage.onChanged.addListener((changes, namespace) => {
+        chrome.storage.onChanged.addListener((changes) => {
             if (changes.api){
                 apiKey = changes.api['newValue']
                 header = new Headers({
@@ -71,6 +71,9 @@ async function setUpEnv(){
             }
         })
 
+        window.addEventListener('beforeunload', async function(){
+            await chrome.storage.sync.set({'automation': null})
+        })
         
         chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
 
@@ -84,13 +87,13 @@ async function setUpEnv(){
                         alert('Number of keywords is not set!')
                         throw new Error('Number of keywords is not set.')
                     }
-                    sendResponse({'starting': 'true'});
+                    sendResponse({'starting': 'true'})
                     await fullAuto(numKeys, aiImages, releases, url, header)
-                    chrome.runtime.sendMessage('stopped')
+                    await chrome.storage.sync.set({'automation': null})
                     alert("All done!")
                 }catch(err){
+                    await chrome.storage.sync.set({'automation': null})
                     console.log(err)
-                    await chrome.runtime.sendMessage('stopped')
                 }
             }
         })
