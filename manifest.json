@@ -1,18 +1,18 @@
 {
     "name": "Adobe Stock Metadata Automation",
-    "description": "your life is complete now",
+    "description": "Fast AI-powered automation tool for Adobe Stock contributors.",
     "version": "1.0",
     "manifest_version": 3,
     "permissions": ["activeTab", "storage", "scripting", "tabs", "power"],
     "icons":{
-        "16":"icon-asma3.png",
-        "32":"icon-asma3.png",
-        "48":"icon-asma3.png",
-        "128":"icon-asma3.png"
+        "16":"icon-asma1.png",
+        "32":"icon-asma1.png",
+        "48":"icon-asma1.png",
+        "128":"icon-asma1.png"
     },
     "action":{
         "default_popup": "popup.html",
-        "default_icon": "icon-asma3.png"
+        "default_icon": "icon-asma1.png"
     },
     "background": {
         "service_workers": "background.js"
@@ -31,6 +31,6 @@
     ],
     "host_permissions": [
         "https://api.openai.com/v1/chat/completions",
-        "https://damisaas.com/asma/api/user"
+        "https://damisaas.com/asma/api*"
     ]
 }

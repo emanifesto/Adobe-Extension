@@ -71,8 +71,14 @@ async function setUpEnv(){
             }
         })
 
-        window.addEventListener('beforeunload', async function(){
-            await chrome.storage.sync.set({'automation': null})
+        window.addEventListener('beforeunload', async function(e){
+            try{
+                chrome.storage.sync.set({'automation': null})
+                e.preventDefault()
+                e.returnValue = ' '
+            }catch(err){
+                console.log(err)
+            }
         })
         
         chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
