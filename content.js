@@ -257,7 +257,7 @@ async function makeKeys(numKeys, url, header){
                 role: 'user',
                 content: [{
                         type: 'text',
-                        text: `Analyze the image throughly. From it, respond with EXACTLY ${numKeys} keywords separated by commas`
+                        text: `Analyze the image thoroughly. From it, respond with EXACTLY ${numKeys} keywords separated by commas`
                     },{
                         type: 'image_url',
                         image_url: {

@@ -3,7 +3,7 @@
     "description": "Fast AI-powered automation tool for Adobe Stock contributors.",
     "version": "1.0",
     "manifest_version": 3,
-    "permissions": ["activeTab", "storage", "scripting", "tabs", "power"],
+    "permissions": ["activeTab", "storage", "scripting", "power"],
     "icons":{
         "16":"icon-asma1.png",
         "32":"icon-asma1.png",
