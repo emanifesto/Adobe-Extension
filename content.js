@@ -332,7 +332,7 @@ async function makeTitle(keywords, url, header){
 }
 
 function checkGenAI(){
-    const editorial = document.querySelector('input#illustrativeEditorialContent')
+    const editorial = document.querySelector('input[data-t="content-tagger-illustrative-editorial-checkbox"]')
     const genAI = document.querySelector('input#content-tagger-generative-ai-checkbox')
     if (editorial.checked)
         editorial.click()
