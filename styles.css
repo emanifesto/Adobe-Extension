@@ -20,17 +20,6 @@
     padding: 0;
 }
 
-.adb-link-open{
-    letter-spacing: 1px;
-    color:#3b71ff;
-    font-size: 13px;
-    margin-bottom: 5px;
-}
-
-.adb-link-open:hover{
-    text-decoration-line: underline;
-}
-
 h1{
     margin: 0 10px;
     padding: 0px;

@@ -257,7 +257,7 @@ async function makeKeys(numKeys, url, header){
                 role: 'user',
                 content: [{
                         type: 'text',
-                        text: `Analyze the image thoroughly. From it, respond with EXACTLY ${numKeys} keywords separated by commas`
+                        text: `Analyze the image throughly. From it, respond with EXACTLY ${numKeys} keywords separated by commas`
                     },{
                         type: 'image_url',
                         image_url: {
@@ -332,7 +332,7 @@ async function makeTitle(keywords, url, header){
 }
 
 function checkGenAI(){
-    const editorial = document.querySelector('input[data-t="content-tagger-illustrative-editorial-checkbox"]')
+    const editorial = document.querySelector('input#illustrativeEditorialContent')
     const genAI = document.querySelector('input#content-tagger-generative-ai-checkbox')
     if (editorial.checked)
         editorial.click()
