@@ -18,7 +18,7 @@ async function setUpEnv(){
         button.id = 'the-btn';
         button.appendChild(icon);
 
-        const target = document.querySelector('div.visible');
+        const target = document.querySelector('div.visible');//div.mobile-tagger-details
         target.insertBefore(button, target.firstChild);
 
         let apiKey = await getAPIkey()
@@ -136,12 +136,14 @@ async function getPayment(){
 }
 
 async function loadMetadata(numKeys, aiImages, releases, url, header){
-    
+    await stall(1000)
+
     if (releases)
         checkNoReleases()
 
-    if(aiImages)
+    if(aiImages){
         checkGenAI()
+    }
 
     let keywords = await makeKeys(numKeys, url, header)
     if (!keywords){
@@ -257,7 +259,7 @@ async function makeKeys(numKeys, url, header){
                 role: 'user',
                 content: [{
                         type: 'text',
-                        text: `Analyze the image throughly. From it, respond with EXACTLY ${numKeys} keywords separated by commas`
+                        text: `Analyze the image thoroughly. From it, respond with EXACTLY ${numKeys} keywords separated by commas`
                     },{
                         type: 'image_url',
                         image_url: {
@@ -332,7 +334,7 @@ async function makeTitle(keywords, url, header){
 }
 
 function checkGenAI(){
-    const editorial = document.querySelector('input#illustrativeEditorialContent')
+    const editorial = document.querySelector('input[data-t="content-tagger-illustrative-editorial-checkbox"]')
     const genAI = document.querySelector('input#content-tagger-generative-ai-checkbox')
     if (editorial.checked)
         editorial.click()
