@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
 
                     await chrome.scripting.insertCSS({
                         target: {tabId: tab.id, allFrames: true},
-                        css: "styles.css",
+                        files: ["styles.css"],
                     })
                     
                     await chrome.scripting.executeScript({
