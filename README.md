@@ -8,4 +8,4 @@ Generating keywords, titles, and other metadata has never been easier.
 It will improve workflow efficiency and save time.
 Progress and searchability in the Adobe Stock search algorithm can be achieved much more quickly.
 
-**Landing Page and Serverless Functions [Repo](https://github.com/Emmanuel1037/Adobe-Extension-Web)** 
+**Landing Page and Serverless Functions [Repo](https://github.com/Emmanuel1037/Domain)** 
